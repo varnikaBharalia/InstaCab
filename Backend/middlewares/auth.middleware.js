@@ -2,6 +2,7 @@ import captainModel from "../models/captain.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import blacklistTokenModel from "../models/blacklistToken.model.js";
+import userModel from "../models/user.model.js";
 
 // captain autheticated h ki nhi humko vo check krna h iske throgh 
 
@@ -23,7 +24,7 @@ export const authUser = async (req, res, next) => {
     try {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         // const captain = decodedToken._id;
-        const User = await captainModel.findById(decodedToken._id);
+        const User = await userModel.findById(decodedToken._id);
         if (!User) {
             return res.status(401).json({ message: "Unauthorized" });
         }
