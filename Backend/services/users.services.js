@@ -7,7 +7,7 @@ export const createUser = async ({ firstname, lastname, email, password }) => {
     }
 
     // .create() saves to the DB immediately. 'new userModel()' does not.
-    const user = userModel.create({
+    const user = await userModel.create({
         fullname: {
             firstname,
             lastname

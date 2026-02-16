@@ -3,17 +3,16 @@ import mongoose from "mongoose";
 const rideSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'user', // 👇 Fixed: Must match the model name 'user' (lowercase)
         required: true,
     },
     captain: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Captain',
+        ref: 'captain', // 👇 Fixed: Must match the model name 'captain' (lowercase)
     },
     pickup: {
         type: String,
         required: true,
-
     },
     destination: {
         type: String,
@@ -29,10 +28,10 @@ const rideSchema = new mongoose.Schema({
         default: 'pending'
     },
     duration: {
-        type: Number
+        type: Number, // in seconds
     },
     distance: {
-        type: Number,
+        type: Number, // in meters
     },
     paymentId: {
         type: String,
@@ -44,10 +43,12 @@ const rideSchema = new mongoose.Schema({
         type: String,
     },
     otp: {
-        type: String, 
-        select: false, // Hide it by default so it's not exposed easily
+        type: String,
+        select: false,
         required: true,
     }
 });
+
 const rideModel = mongoose.model('ride', rideSchema);
+
 export default rideModel;

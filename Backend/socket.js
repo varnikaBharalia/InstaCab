@@ -4,7 +4,7 @@ import captainModel from "./models/captain.model.js";
 
 let io;
 
-export const initaliseSockets = (server) => {
+export const initializeSocket = (server) => {
     io = new Server(server, {
         cors: {
             origin: '*',
@@ -13,11 +13,12 @@ export const initaliseSockets = (server) => {
     });
 
     io.on('connection', (socket) => {
-        console.log('New client connected:', socket.id);
+        console.log(`New client connected: ${socket.id}`);
 
+        // 1. Join Event: Updates the socketId in the database
         socket.on('join', async (data) => {
             const { userId, userType } = data;
-            
+
             if (userType === 'user') {
                 await userModel.findByIdAndUpdate(userId, { socketId: socket.id });
             } else if (userType === 'captain') {
@@ -25,16 +26,14 @@ export const initaliseSockets = (server) => {
             }
         });
 
-        // -------------
+        // 2. Update Location Event: Updates captain's coordinates
         socket.on('update-location-captain', async (data) => {
             const { userId, location } = data;
 
-            // Basic Validation
             if (!location || !location.ltd || !location.lng) {
                 return socket.emit('error', { message: 'Invalid location data' });
             }
 
-            // Update Captain's Location in DB
             await captainModel.findByIdAndUpdate(userId, {
                 location: {
                     ltd: location.ltd,
@@ -44,11 +43,12 @@ export const initaliseSockets = (server) => {
         });
 
         socket.on('disconnect', () => {
-            console.log('Client disconnected:', socket.id);
+            console.log(`Client disconnected: ${socket.id}`);
         });
     });
 };
 
+// Function to send messages to a specific user/captain
 export const sendMessageToSocketId = (socketId, messageObject) => {
     if (io) {
         io.to(socketId).emit(messageObject.event, messageObject.data);

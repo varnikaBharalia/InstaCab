@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
             required: true,
             minlength: [3, 'First name must be at least 3 characters']
         },
-        lastname: { // Changed from LastName to lastname for consistency
+        lastname: {
             type: String,
             minlength: [3, 'Last name must be at least 3 characters']
         }
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        select: false, // Prevents password from being returned in query results
+        select: false,
     },
     socketId: {
         type: String,

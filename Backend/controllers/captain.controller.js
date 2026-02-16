@@ -1,5 +1,5 @@
 import captainModel from "../models/captain.model.js";
-import { createCaptain } from "../services/caption.services.js"; // Fixed typo 'caption' -> 'captain'
+import { createCaptain } from "../services/captains.services.js"; // Fixed typo 'caption' -> 'captain'
 import { validationResult } from "express-validator";
 import blackListToken from '../models/blacklistToken.model.js';
 
