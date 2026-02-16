@@ -32,7 +32,7 @@
 //     }
 
 //     const apiKey = process.env.GOOGLE_MAPS_API;
-    
+
 //     // Google Maps Distance Matrix API endpoint
 //     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
 
@@ -40,7 +40,7 @@
 //         const response = await axios.get(url);
 
 //         if (response.data.status === 'OK') {
-            
+
 //             // Check if the route was actually found
 //             if (response.data.rows[0].elements[0].status === 'ZERO_RESULTS') {
 //                 throw new Error('No routes found');
@@ -82,6 +82,8 @@
 
 
 import axios from 'axios';
+import captainModel from '../models/captain.model.js';
+
 
 export const getAddressCoordinate = async (address) => {
     // 1. URL for OpenStreetMap (Nominatim) - No API Key needed
@@ -94,7 +96,7 @@ export const getAddressCoordinate = async (address) => {
         // 2. Nominatim requires a User-Agent header to prevent blocking
         const response = await axios.get(url, {
             headers: {
-                'User-Agent': 'InstaCab-App/1.0' 
+                'User-Agent': 'InstaCab-App/1.0'
             }
         });
 
@@ -134,14 +136,14 @@ export const getDistanceTime = async (origin, destination) => {
 
         if (response.data.code === 'Ok') {
             const route = response.data.routes[0];
-            
+
             return {
-                distance: { 
-                    text: (route.distance / 1000).toFixed(1) + " km", 
+                distance: {
+                    text: (route.distance / 1000).toFixed(1) + " km",
                     value: route.distance // Returns in meters
                 },
-                duration: { 
-                    text: Math.round(route.duration / 60) + " min", 
+                duration: {
+                    text: Math.round(route.duration / 60) + " min",
                     value: route.duration // Returns in seconds
                 }
             };
@@ -168,7 +170,7 @@ export const getAutoCompleteSuggestions = async (input) => {
         const response = await axios.get(url, {
             headers: {
                 // REQUIRED: Nominatim blocks requests without a valid User-Agent
-                'User-Agent': 'InstaCab-App/1.0' 
+                'User-Agent': 'InstaCab-App/1.0'
             }
         });
 
@@ -179,4 +181,16 @@ export const getAutoCompleteSuggestions = async (input) => {
         console.error("Autocomplete Error:", err.message);
         throw err;
     }
+};
+
+export const getCaptainsInTheRadius = async (ltd, lng, radius) => {
+    // Radius in km
+    const captains = await captainModel.find({
+        location: {
+            $geoWithin: {
+                $centerSphere: [ [ ltd, lng ], radius / 6371 ]
+            }
+        }
+    });
+    return captains;
 };

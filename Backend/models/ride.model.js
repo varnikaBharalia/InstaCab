@@ -43,11 +43,11 @@ const rideSchema = new mongoose.Schema({
     signature: {
         type: String,
     },
-    // otp: {
-    //     type: String, 
-    //     select: false, // Hide it by default so it's not exposed easily
-    //     required: true,
-    // }
+    otp: {
+        type: String, 
+        select: false, // Hide it by default so it's not exposed easily
+        required: true,
+    }
 });
 const rideModel = mongoose.model('ride', rideSchema);
 export default rideModel;

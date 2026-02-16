@@ -10,32 +10,36 @@ export const getFare = async (pickup, destination) => {
 
     const distanceTime = await getDistanceTime(pickup, destination);
 
+    console.log(distanceTime);
+
+
     const baseFare = {
         auto: 30,
         car: 50,
-        motorbike: 20
+        moto: 20
     };
 
     const perKmRate = {
         auto: 10,
         car: 15,
-        motorbike: 8
+        moto: 8
     };
 
     const perMinuteRate = {
         auto: 2,
         car: 3,
-        motorbike: 1
+        moto: 1
     };
 
     const fare = {
         auto: Math.round(baseFare.auto + ((distanceTime.distance.value / 1000) * perKmRate.auto) + ((distanceTime.duration.value / 60) * perMinuteRate.auto)),
         car: Math.round(baseFare.car + ((distanceTime.distance.value / 1000) * perKmRate.car) + ((distanceTime.duration.value / 60) * perMinuteRate.car)),
-        motorbike: Math.round(baseFare.motorbike + ((distanceTime.distance.value / 1000) * perKmRate.motorbike) + ((distanceTime.duration.value / 60) * perMinuteRate.motorbike))
+        moto: Math.round(baseFare.moto + ((distanceTime.distance.value / 1000) * perKmRate.moto) + ((distanceTime.duration.value / 60) * perMinuteRate.moto))
     };
 
     return fare;
 };
+export default getFare;
 
 // 2. Helper to generate a random OTP (Optional but recommended)
 function getOtp(num) {
@@ -54,14 +58,20 @@ export const createRide = async ({ user, pickup, destination, vehicleType }) => 
 
     // Calculate details first
     const fare = await getFare(pickup, destination);
+    
+    if (!fare[vehicleType]) {
+        throw new Error('Invalid vehicle type');
+    }
+    console.log(fare);
+
 
     // Create the ride in DB
     const ride = rideModel.create({
         user,
         pickup,
         destination,
-        // otp: getOtp(6),
-        fare: fare[vehicleType] // Pick the fare for the specific vehicle type (auto/car/motorbike)
+        otp: getOtp(6),
+        fare: fare[vehicleType] // Pick the fare for the specific vehicle type (auto/car/moto)
     });
 
     return ride;
