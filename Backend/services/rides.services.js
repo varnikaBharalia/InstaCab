@@ -1,4 +1,5 @@
 import rideModel from '../models/ride.model.js';
+import captainModel from '../models/captain.model.js';
 import { getDistanceTime } from './maps.services.js';
 import crypto from 'crypto';
 
@@ -47,7 +48,6 @@ function getOtp(num) {
 
 // ==========================================================
 
-
 export const createRide = async ({ user, pickup, destination, vehicleType }) => {
     if (!user || !pickup || !destination || !vehicleType) {
         throw new Error('All fields are required');
@@ -75,11 +75,17 @@ export const confirmRide = async ({ rideId, captain }) => {
         throw new Error('Ride id is required');
     }
 
+    // 1. Update Ride Status
     await rideModel.findOneAndUpdate({
         _id: rideId
     }, {
         status: 'accepted',
         captain: captain._id
+    });
+
+    // 2. Update Captain Status to 'unavailable' so they don't get new requests
+    await captainModel.findByIdAndUpdate(captain._id, {
+        status: 'unavailable'
     });
 
     const ride = await rideModel.findOne({
@@ -119,6 +125,8 @@ export const startRide = async ({ rideId, otp, captain }) => {
     }, {
         status: 'ongoing'
     });
+    // We return the updated object (manually updating local variable to save a DB call)
+    ride.status = 'ongoing';  // ------------------------------------------------->>>>
 
     return ride;
 };
@@ -130,7 +138,7 @@ export const endRide = async ({ rideId, captain }) => {
 
     const ride = await rideModel.findOne({
         _id: rideId,
-        captain: captain._id // Ensure only the assigned captain can end it
+        captain: captain._id
     }).populate('user').populate('captain').select('+otp');
 
     if (!ride) {
@@ -141,11 +149,18 @@ export const endRide = async ({ rideId, captain }) => {
         throw new Error('Ride not ongoing');
     }
 
+    // 1. Update Ride Status to Completed
     await rideModel.findOneAndUpdate({
         _id: rideId
     }, {
         status: 'completed'
     });
 
+    // 2. Update Captain Status back to 'active' so they can take new rides
+    await captainModel.findByIdAndUpdate(captain._id, {
+        status: 'active'
+    });
+
+    ride.status = 'completed';   ///------------------------------------>>>>>
     return ride;
 };

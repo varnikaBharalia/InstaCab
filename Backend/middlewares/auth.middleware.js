@@ -25,14 +25,16 @@ export const authUser = async (req, res, next) => {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         // const captain = decodedToken._id;
         const User = await userModel.findById(decodedToken._id);
+        console.log(User);
+        
         if (!User) {
-            return res.status(401).json({ message: "Unauthorized" });
+            return res.status(401).json({ message: "Unauthorized User" });
         }
         req.user = User;
         return next();
 
     } catch (error) {
-        return res.status(401).json({ messsage: "Unauthorised" });
+        return res.status(401).json({ messsage: "Unauthorised" ,  error });
     }
 };
 
@@ -60,6 +62,6 @@ export const authCaptain = async (req, res, next) => {
         return next();
 
     } catch (error) {
-        return res.status(401).json({ messsage: "Unauthorised" });
+        return res.status(401).json({ message: "Unauthorised" });
     }
 }

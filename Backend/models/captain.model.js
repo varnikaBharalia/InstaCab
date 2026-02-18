@@ -53,23 +53,17 @@ const captainSchema = new mongoose.Schema({
         vehicleType: {
             type: String,
             required: true,
-            // 👇 FIX: Must match ride.service.js (moto, car, auto)
-            enum: ['car', 'moto', 'auto'] 
+            enum: ['car', 'moto', 'auto']
         }
     },
     location: {
-        // 👇 FIX: Must use 'ltd' and 'lng' to match your maps service
-        ltd: { 
-            type: Number 
-        },
-        lng: { 
-            type: Number 
-        }
+        type: [Number], // Stored as [lng, ltd]
+        index: '2dsphere' // This single definition is enough
     }
 });
 
-// 👇 CRITICAL: Enables "Find Captains Nearby" queries
-captainSchema.index({ location: '2dsphere' });
+// REMOVED DUPLICATE INDEX HERE:
+// captainSchema.index({ location: '2dsphere' }); 
 
 captainSchema.methods.generateAuthToken = function () {
     const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '24h' });

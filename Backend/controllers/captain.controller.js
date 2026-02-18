@@ -1,7 +1,8 @@
 import captainModel from "../models/captain.model.js";
-import { createCaptain } from "../services/captains.services.js"; // Fixed typo 'caption' -> 'captain'
+import { createCaptain } from "../services/captains.services.js";
 import { validationResult } from "express-validator";
 import blackListToken from '../models/blacklistToken.model.js';
+import jwt from "jsonwebtoken";
 
 export const registerCaptain = async (req, res, next) => {
     const errors = validationResult(req);
@@ -11,29 +12,31 @@ export const registerCaptain = async (req, res, next) => {
 
     const { fullname, email, password, vehicle } = req.body;
 
-    // Check if captain already exists
-    const isCaptainAlreadyExist = await captainModel.findOne({ email });
-    if (isCaptainAlreadyExist) {
-        return res.status(400).json({ message: 'Captain already exists' });
+    try {
+        const isCaptainAlreadyExist = await captainModel.findOne({ email });
+        if (isCaptainAlreadyExist) {
+            return res.status(400).json({ message: 'Captain already exists' });
+        }
+
+        const hashedPassword = await captainModel.hashPassword(password);
+
+        const captain = await createCaptain({
+            firstname: fullname.firstname,
+            lastname: fullname.lastname,
+            email,
+            password: hashedPassword,
+            color: vehicle.color,
+            plate: vehicle.plate,
+            capacity: vehicle.capacity,
+            vehicleType: vehicle.vehicleType
+        });
+
+        const token = captain.generateAuthToken();
+
+        res.status(201).json({ message: "Captain registered successfully", token, captain });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal Server Error', error: err.message });
     }
-
-    // Hash password using the static method on the model
-    const hashedPassword = await captainModel.hashPassword(password);
-
-    const captain = await createCaptain({
-        firstname: fullname.firstname,
-        lastname: fullname.lastname,
-        email,
-        password: hashedPassword,
-        color: vehicle.color,
-        plate: vehicle.plate,
-        capacity: vehicle.capacity,
-        vehicleType: vehicle.vehicleType
-    });
-
-    const token = captain.generateAuthToken();
-
-    res.status(201).json({ message: "Captain registered successfully", token, captain });
 }
 
 export const loginCaptain = async (req, res, next) => {
@@ -44,41 +47,49 @@ export const loginCaptain = async (req, res, next) => {
 
     const { email, password } = req.body;
 
-    // 1. Find captain and get password (since select: false is likely set in model)
-    const captain = await captainModel.findOne({ email }).select('+password');
+    try {
+        const captain = await captainModel.findOne({ email }).select('+password');
+        console.log(captain);
 
-    // 2. If captain not found, return error
-    if (!captain) {
-        return res.status(401).json({ message: 'Invalid email or password' });
+        if (!captain) {
+            console.log(captain);
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        const isMatch = await captain.comparePassword(password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        const token = captain.generateAuthToken();
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({ message: "Captain logged in successfully", token, captain });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal Server Error', error: err.message });
     }
-
-    // 3. Check password match
-    const isMatch = await captain.comparePassword(password);
-    if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-    }
-
-    // --- REMOVED THE "ALREADY EXISTS" CHECK HERE --- 
-    // It was causing the bug. You want the user to exist during login.
-
-    const token = captain.generateAuthToken();
-    
-    res.cookie('token', token);
-
-    res.status(200).json({ message: "Captain logged in successfully", token, captain });
 }
 
 export const getCaptainProfile = async (req, res, next) => {
-    // req.captain is populated by your auth middleware
     res.status(200).json({ captain: req.captain });
 }
 
 export const logoutCaptain = async (req, res, next) => {
-    const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
-    
-    await blackListToken.create({ token });
-    
-    res.clearCookie('token');
+    try {
+        const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
 
-    res.status(200).json({ message: 'Logged Out' });
+        if (token) {
+            await blackListToken.create({ token });
+        }
+
+        res.clearCookie('token');
+        res.status(200).json({ message: 'Logged Out' });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal Server Error', error: err.message });
+    }
 }
