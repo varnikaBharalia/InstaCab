@@ -13,11 +13,15 @@ connectToDB();
 
 const app = express();
 
-// Improved CORS for frontend connection
+// Enable CORS for the frontend and allow cookies/credentials
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 app.use(cors({
-    origin: 'http://localhost:5173', // Vite's default port
-    credentials: true
+	origin: FRONTEND_URL,
+	credentials: true
 }));
+
+// Ensure preflight responses also use the same CORS settings
+// app.options('*', cors({ origin: FRONTEND_URL, credentials: true }));
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
