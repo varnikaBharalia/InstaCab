@@ -47,6 +47,10 @@ export const getSuggestions = async (req, res, next) => {
         }
 
         const { input } = req.query;
+        
+        if (!input || input.trim() === '') {
+            return res.status(200).json([]);   // return empty suggestions
+        }
 
         const suggestions = await getAutoCompleteSuggestions(input);
 
