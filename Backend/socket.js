@@ -45,33 +45,73 @@ export const initializeSocket = (server) => {
             // Determine if it's a User or Captain based on the schema or model checks
             // Or simpler: Try updating both (inefficient) or check a type field if you have one.
             // Since we fetched the user in middleware, we can check instance:
-            
+
             if (socket.user.email && !socket.user.vehicle) { // Simple check for User
                 await userModel.findByIdAndUpdate(socket.user._id, { socketId: socket.id });
-            } else if (socket.user.vehicle) { // Check for Captain
-                await captainModel.findByIdAndUpdate(socket.user._id, { socketId: socket.id });
+            }
+            else if (socket.user.vehicle) { // Check for Captain
+                await captainModel.findByIdAndUpdate(socket.user._id, {
+                    socketId: socket.id,
+                    status: 'active'  // ----------------------->>>>>>
+                });
+                console.log("🚖 Captain is now ACTIVE:", socket.user._id);
+
             }
         }
 
+
+        // ✅ ADD THIS (VERY IMPORTANT 🔥)
+        socket.on('join', async ({ userId, userType }) => {
+            console.log(`🔗 ${userType} joined: ${userId}`);
+
+            if (userType === 'user') {
+                await userModel.findByIdAndUpdate(userId, {
+                    socketId: socket.id
+                });
+            }
+
+            if (userType === 'captain') {
+                await captainModel.findByIdAndUpdate(userId, {
+                    socketId: socket.id,
+                    status: 'active'   // ✅ ALSO HERE
+                });
+            }
+        });
+
+
         socket.on('update-location-captain', async (data) => {
+
+                console.log("📍 Location update:", data);   // 🔥 ADD THIS
+
+
             const { userId, location } = data;
 
             // Security: Ensure the socket is updating their own location
-            if(socket.user._id.toString() !== userId) {
-                 return socket.emit('error', { message: 'Unauthorized location update' });
+            if (socket.user._id.toString() !== userId) {
+                return socket.emit('error', { message: 'Unauthorized location update' });
             }
 
-            if (!location || !location.ltd || !location.lng) {
+            if (!location || !location.lat || !location.lng) {
                 return socket.emit('error', { message: 'Invalid location data' });
             }
 
             await captainModel.findByIdAndUpdate(userId, {
-                location: [location.lng, location.ltd] 
+                location: {
+                    type: "Point",
+                    coordinates: [location.lng, location.lat]
+                }
             });
         });
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             console.log(`Client disconnected: ${socket.id}`);
+
+            // ✅ OPTIONAL: mark captain inactive on disconnect
+            if (socket.user?.vehicle) {
+                await captainModel.findByIdAndUpdate(socket.user._id, {
+                    status: 'inactive'
+                });
+            }
         });
     });
 };

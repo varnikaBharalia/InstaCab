@@ -53,18 +53,22 @@ export const createRide = async ({ user, pickup, destination, vehicleType }) => 
         throw new Error('All fields are required');
     }
 
+    const distanceTime = await getDistanceTime(pickup, destination);
+
     const fare = await getFare(pickup, destination);
 
     if (!fare[vehicleType]) {
         throw new Error('Invalid vehicle type');
     }
 
-    const ride = rideModel.create({
+    const ride =  await rideModel.create({
         user,
         pickup,
         destination,
         otp: getOtp(6),
-        fare: fare[vehicleType]
+        fare: fare[vehicleType],
+        distance: distanceTime.distance.value, 
+        duration: distanceTime.duration.value
     });
 
     return ride;

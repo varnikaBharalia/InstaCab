@@ -43,6 +43,7 @@ const captainSchema = new mongoose.Schema({
         plate: {
             type: String,
             required: true,
+            unique: true,
             minlength: [3, 'Plate Number must be at least 3 characters long'],
         },
         capacity: {
@@ -56,9 +57,21 @@ const captainSchema = new mongoose.Schema({
             enum: ['car', 'moto', 'auto']
         }
     },
+    // location: {
+    // type: [Number], // Stored as [lng, lat]
+    // index: '2dsphere' // This single definition is enough
+    // }
     location: {
-        type: [Number], // Stored as [lng, ltd]
-        index: '2dsphere' // This single definition is enough
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number],
+            default: [0, 0],   // 🔥 ADD THIS
+            index: '2dsphere'
+        }
     }
 });
 

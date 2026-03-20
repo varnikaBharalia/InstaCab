@@ -3,6 +3,8 @@ import { createCaptain } from "../services/captains.services.js";
 import { validationResult } from "express-validator";
 import blackListToken from '../models/blacklistToken.model.js';
 import jwt from "jsonwebtoken";
+import rideModel from "../models/ride.model.js";
+
 
 export const registerCaptain = async (req, res, next) => {
     const errors = validationResult(req);
@@ -75,9 +77,62 @@ export const loginCaptain = async (req, res, next) => {
     }
 }
 
-export const getCaptainProfile = async (req, res, next) => {
-    res.status(200).json({ captain: req.captain });
-}
+
+
+
+
+// export const getCaptainProfile = async (req, res, next) => {
+//     res.status(200).json({ captain: req.captain });
+// }
+
+
+export const getCaptainProfile = async (req, res) => {
+    try {
+        const captainId = req.captain._id;
+
+        // 🔥 1. Fetch ALL completed rides for this captain
+        const rides = await rideModel.find({
+            captain: captainId,
+            status: 'completed'
+        });
+
+        // 🔥 2. TOTAL RIDES
+        const totalRides = rides.length;
+
+        // 🔥 3. TOTAL EARNINGS
+        const totalEarnings = rides.reduce((sum, ride) => {
+            return sum + (ride.fare || 0);
+        }, 0);
+
+        // 🔥 4. TOTAL DISTANCE (meters → convert in frontend)
+        const totalDistance = rides.reduce((sum, ride) => {
+            return sum + (ride.distance || 0);
+        }, 0);
+
+        // 🔥 5. TOTAL TIME (seconds → convert in frontend)
+        const totalTime = rides.reduce((sum, ride) => {
+            return sum + (ride.duration || 0);
+        }, 0);
+
+        // 🔥 6. RESPONSE
+        res.status(200).json({
+            captain: req.captain,
+            stats: {
+                totalRides,
+                totalEarnings,
+                totalDistance,
+                totalTime
+            }
+        });
+
+    } catch (err) {
+        console.error("Captain Profile Error:", err.message);
+        res.status(500).json({
+            message: "Failed to fetch captain profile",
+            error: err.message
+        });
+    }
+};
 
 export const logoutCaptain = async (req, res, next) => {
     try {

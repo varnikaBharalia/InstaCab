@@ -1,50 +1,228 @@
-import React from 'react'
+
+
+// import React, { useState } from 'react'
+// import instacab from '../assets/instacab.png'
+// import motorbike from '../assets/motorbike.png'
+// import instaauto from '../assets/instauto.png'
+
+// const VehiclePanel = (props) => {
+
+//     const [selected, setSelected] = useState(null)
+
+//     const handleSelect = (type) => {
+//         setSelected(type)
+//         props.selectVehicle(type)
+
+//         // ✅ IMPORTANT FIX
+//         props.setVehiclePanel(false)   // close this panel
+//         props.setConfirmRidePanel(true) // open next
+//     }
+
+//     return (
+//         <div className='px-3'>
+//             <h5
+//                 className='p-1 text-center w-[93%] absolute top-0 cursor-pointer'
+//                 onClick={() => props.setConfirmRidePanel(false)}
+//             >
+//                 <i className="text-xl text-gray-500 ri-arrow-down-wide-line"></i>
+//             </h5>
+
+//             {/* TITLE */}
+//             <h3 className='text-xl font-semibold mb-6 text-gray-900'>
+//                 Choose a vehicle
+//             </h3>
+
+//             {/* 🚗 INSTACAB */}
+//             <div
+//                 onClick={() => {
+//                     handleSelect('car')
+//                     props.setConfirmRidePanel(true)
+//                 }}
+//                 className={`flex mb-4 w-full p-3 items-center justify-between 
+//                 border rounded-lg cursor-pointer transition-all duration-200
+//                 ${selected === 'car'
+//                         ? 'bg-[#fff4f7] scale-105 shadow-md border-[#e56f96]'
+//                         : 'border-[#e56f96]'}`}
+//             >
+//                 <img className='h-12 object-contain' src={instacab} alt="" />
+
+//                 <div className='ml-3 flex-1'>
+//                     <h4 className='text-base font-medium text-gray-900'>
+//                         InstaCab <span className='text-gray-500 text-xs ml-1'><i className="ri-user-3-fill"></i> 4</span>
+//                     </h4>
+//                     <h5 className='text-sm text-gray-500'>2 mins away</h5>
+//                     <p className='text-xs text-gray-400'>Comfortable everyday rides</p>
+//                 </div>
+
+//                 <h2 className='text-base font-semibold text-gray-900'>
+//                     ₹{props.fare.car}
+//                 </h2>
+//             </div>
+
+//             {/* 🏍️ MOTORBIKE */}
+//             <div
+//                 onClick={() => {
+//                     handleSelect('moto')
+//                     props.setConfirmRidePanel(true)
+//                 }}
+//                 className={`flex mb-4 w-full p-3 items-center justify-between 
+//                 border rounded-lg cursor-pointer transition-all duration-200
+//                 ${selected === 'moto'
+//                         ? 'bg-[#fff4f7] scale-105 shadow-md border-[#e56f96]'
+//                         : 'border-[#e56f96]'}`}
+//             >
+//                 <img className='h-12 object-contain' src={motorbike} alt="" />
+
+//                 <div className='ml-3 flex-1'>
+//                     <h4 className='text-base font-medium text-gray-900'>
+//                         MotorBike <span className='text-gray-500 text-xs ml-1'><i className="ri-user-3-fill"></i> 1</span>
+//                     </h4>
+//                     <h5 className='text-sm text-gray-500'>3 mins away</h5>
+//                     <p className='text-xs text-gray-400'>Quick & affordable rides</p>
+//                 </div>
+
+//                 <h2 className='text-base font-semibold text-gray-900'>
+//                     ₹{props.fare.moto}
+//                 </h2>
+//             </div>
+
+//             {/* 🚕 INSTAAUTO */}
+//             <div
+//                 onClick={() => {
+//                     handleSelect('auto')
+//                     props.setConfirmRidePanel(true)
+//                 }}
+//                 className={`flex mb-4 w-full p-3 items-center justify-between 
+//                 border rounded-lg cursor-pointer transition-all duration-200
+//                 ${selected === 'auto'
+//                         ? 'bg-[#fff4f7] scale-105 shadow-md border-[#e56f96]'
+//                         : 'border-[#e56f96]'}`}
+//             >
+//                 <img className='h-12 object-contain' src={instaauto} alt="" />
+
+//                 <div className='ml-3 flex-1'>
+//                     <h4 className='text-base font-medium text-gray-900'>
+//                         InstaAuto <span className='text-gray-500 text-xs ml-1'><i className="ri-user-3-fill"></i> 3</span>
+//                     </h4>
+//                     <h5 className='text-sm text-gray-500'>3 mins away</h5>
+//                     <p className='text-xs text-gray-400'>Affordable auto rides</p>
+//                 </div>
+
+//                 <h2 className='text-base font-semibold text-gray-900'>
+//                     ₹{props.fare.auto}
+//                 </h2>
+//             </div>
+
+//         </div>
+//     )
+// }
+
+// export default VehiclePanel
+
+
+import React, { useState } from 'react'
+import instacab from '../assets/instacab.png'
+import motorbike from '../assets/motorbike.png'
+import instaauto from '../assets/instauto.png'
 
 const VehiclePanel = (props) => {
+
+    const [selected, setSelected] = useState(null)
+
+    const handleSelect = (type) => {
+        setSelected(type)
+        props.selectVehicle(type)
+
+        // ✅ IMPORTANT FIX
+        props.setVehiclePanel(false)   // close this panel
+        props.setConfirmRidePanel(true) // open next
+    }
+
     return (
-        <div>
-            <h5 className='p-1 text-center w-[93%] absolute top-0' onClick={() => {
-                props.setVehiclePanel(false)
-            }}><i className="text-3xl text-gray-200 ri-arrow-down-wide-line"></i></h5>
-            <h3 className='text-2xl font-semibold mb-5'>Choose a Vehicle</h3>
+        <div className='px-4 py-4 relative'>
+
+            {/* 🔥 DRAG HANDLE (BETTER UI) */}
+            {/* <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div> */}
+
+            {/* ❌ REMOVED absolute top issue */}
+
+            {/* TITLE */}
+            <h3 className='text-xl font-semibold mb-6 text-gray-900 text-center'>
+                Choose a vehicle
+            </h3>
+
+            {/* 🚗 INSTACAB */}
             <div
-                onClick={() => {
-                    props.selectVehicle('car')
+                onClick={() => handleSelect('car')}
+                className={`flex mb-4 w-full p-3 items-center justify-between 
+                border rounded-xl cursor-pointer transition-all duration-200
+                ${selected === 'car'
+                        ? 'bg-[#fff4f7] scale-105 shadow-md border-[#e56f96]'
+                        : 'border-gray-200'}`}
+            >
+                <img className='h-12 object-contain' src={instacab} alt="" />
 
-                }}
-                className='flex border-2 active:border-black  mb-2 rounded-xl w-full p-3  items-center justify-between'>
+                <div className='ml-3 flex-1'>
+                    <h4 className='text-base font-medium text-gray-900'>
+                        InstaCab <span className='text-gray-500 text-xs ml-1'><i className="ri-user-3-fill"></i> 4</span>
+                    </h4>
+                    <h5 className='text-sm text-gray-500'>2 mins away</h5>
+                    <p className='text-xs text-gray-400'>Comfortable everyday rides</p>
+                </div>
 
-                <img className='h-10' src="https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg" alt="" />
+                <h2 className='text-base font-semibold text-gray-900'>
+                    ₹{props.fare?.car || 0}
+                </h2>
+            </div>
 
-                <div className='ml-2 w-1/2'>
-                    <h4 className='font-medium text-base'>UberGo <span><i className="ri-user-3-fill"></i>4</span></h4>
-                    <h5 className='font-medium text-sm'>2 mins away </h5>
-                    <p className='font-normal text-xs text-gray-600'>Affordable, compact rides</p>
+            {/* 🏍️ MOTORBIKE */}
+            <div
+                onClick={() => handleSelect('moto')}
+                className={`flex mb-4 w-full p-3 items-center justify-between 
+                border rounded-xl cursor-pointer transition-all duration-200
+                ${selected === 'moto'
+                        ? 'bg-[#fff4f7] scale-105 shadow-md border-[#e56f96]'
+                        : 'border-gray-200'}`}
+            >
+                <img className='h-12 object-contain' src={motorbike} alt="" />
+
+                <div className='ml-3 flex-1'>
+                    <h4 className='text-base font-medium text-gray-900'>
+                        MotorBike <span className='text-gray-500 text-xs ml-1'><i className="ri-user-3-fill"></i> 1</span>
+                    </h4>
+                    <h5 className='text-sm text-gray-500'>3 mins away</h5>
+                    <p className='text-xs text-gray-400'>Quick & affordable rides</p>
                 </div>
-                <h2 className='text-lg font-semibold'>₹{props.fare.car}</h2>
+
+                <h2 className='text-base font-semibold text-gray-900'>
+                    ₹{props.fare?.moto || 0}
+                </h2>
             </div>
-            <div onClick={() => {
-                props.selectVehicle('moto')
-            }} className='flex border-2 active:border-black mb-2 rounded-xl w-full p-3  items-center justify-between'>
-                <img className='h-10' src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_638,w_956/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png" alt="" />
-                <div className='-ml-2 w-1/2'>
-                    <h4 className='font-medium text-base'>Moto <span><i className="ri-user-3-fill"></i>1</span></h4>
-                    <h5 className='font-medium text-sm'>3 mins away </h5>
-                    <p className='font-normal text-xs text-gray-600'>Affordable motorcycle rides</p>
+
+            {/* 🚕 INSTAAUTO */}
+            <div
+                onClick={() => handleSelect('auto')}
+                className={`flex mb-4 w-full p-3 items-center justify-between 
+                border rounded-xl cursor-pointer transition-all duration-200
+                ${selected === 'auto'
+                        ? 'bg-[#fff4f7] scale-105 shadow-md border-[#e56f96]'
+                        : 'border-gray-200'}`}
+            >
+                <img className='h-12 object-contain' src={instaauto} alt="" />
+
+                <div className='ml-3 flex-1'>
+                    <h4 className='text-base font-medium text-gray-900'>
+                        InstaAuto <span className='text-gray-500 text-xs ml-1'><i className="ri-user-3-fill"></i> 3</span>
+                    </h4>
+                    <h5 className='text-sm text-gray-500'>3 mins away</h5>
+                    <p className='text-xs text-gray-400'>Affordable auto rides</p>
                 </div>
-                <h2 className='text-lg font-semibold'>₹{props.fare.moto}</h2>
+
+                <h2 className='text-base font-semibold text-gray-900'>
+                    ₹{props.fare?.auto || 0}
+                </h2>
             </div>
-            <div onClick={() => {
-                props.setConfirmRidePanel(true)
-            }} className='flex border-2 active:border-black mb-2 rounded-xl w-full p-3  items-center justify-between'>
-                <img className='h-10' src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_368,w_552/v1648431773/assets/1d/db8c56-0204-4ce4-81ce-56a11a07fe98/original/Uber_Auto_558x372_pixels_Desktop.png" alt="" />
-                <div className='ml-2 w-1/2'>
-                    <h4 className='font-medium text-base'>UberAuto <span><i className="ri-user-3-fill"></i>3</span></h4>
-                    <h5 className='font-medium text-sm'>3 mins away </h5>
-                    <p className='font-normal text-xs text-gray-600'>Affordable Auto rides</p>
-                </div>
-                <h2 className='text-lg font-semibold'>₹{props.fare.auto}</h2>
-            </div>
+
         </div>
     )
 }
