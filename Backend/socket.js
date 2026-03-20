@@ -2,6 +2,8 @@ import { Server } from "socket.io";
 import userModel from "./models/user.model.js";
 import captainModel from "./models/captain.model.js";
 import jwt from "jsonwebtoken"; // Ensure you import JWT
+import rideModel from './models/ride.model.js';
+import { getAddressCoordinate, getCaptainsInTheRadius } from './services/maps.services.js';
 
 let io;
 
@@ -81,7 +83,7 @@ export const initializeSocket = (server) => {
 
         socket.on('update-location-captain', async (data) => {
 
-                console.log("📍 Location update:", data);   // 🔥 ADD THIS
+            console.log("📍 Location update:", data);   // 🔥 ADD THIS
 
 
             const { userId, location } = data;
@@ -101,7 +103,36 @@ export const initializeSocket = (server) => {
                     coordinates: [location.lng, location.lat]
                 }
             });
+
+
+            // ✅ NEW: notify captain of any pending nearby rides
+            try {
+                const captain = await captainModel.findById(userId);
+                const pendingRides = await rideModel.find({ status: 'pending' }).populate('user').select('+otp');
+
+                for (const ride of pendingRides) {
+                    const pickupCoords = await getAddressCoordinate(ride.pickup);
+                    const nearbyCaptains = await getCaptainsInTheRadius(
+                        pickupCoords.lat,
+                        pickupCoords.lng,
+                        2
+                    );
+
+                    const isNearby = nearbyCaptains.some(c => c._id.toString() === userId);
+                    const isRightVehicle = captain.vehicle.vehicleType === ride.vehicleType;
+
+                    if (isNearby && isRightVehicle) {
+                        socket.emit('new-ride', ride);
+                        console.log(`🔔 Notified captain ${userId} of pending ride ${ride._id}`);
+                    }
+                }
+            } catch (err) {
+                console.error('Error checking pending rides:', err);
+            }
+
         });
+
+
 
         socket.on('disconnect', async () => {
             console.log(`Client disconnected: ${socket.id}`);

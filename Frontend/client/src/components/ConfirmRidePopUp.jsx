@@ -311,6 +311,12 @@ const ConfirmRidePopUp = (props) => {
     const submitHander = async (e) => {
         e.preventDefault()
 
+        console.log("🔑 OTP being sent:", otp)
+        console.log("🚗 Ride ID:", ride._id)
+        console.log("🔐 Token:", localStorage.getItem('captain-token'))  // ✅ check this
+
+
+
         try {
             const response = await axios.get(
                 `${import.meta.env.VITE_BASE_URL}/rides/start-ride`,

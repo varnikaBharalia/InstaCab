@@ -70,10 +70,12 @@ const captainSchema = new mongoose.Schema({
         coordinates: {
             type: [Number],
             default: [0, 0],   // 🔥 ADD THIS
-            index: '2dsphere'
+            // index: '2dsphere'
         }
     }
 });
+captainSchema.index({ location: '2dsphere' });
+
 
 // REMOVED DUPLICATE INDEX HERE:
 // captainSchema.index({ location: '2dsphere' }); 
