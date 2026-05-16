@@ -133,7 +133,7 @@ const CaptainRiding = () => {
                 </button>
             </div>
 
-            {/* 🔽 FINISH PANEL
+            {/* 🔽 FINISH PANEL */}
             <div
                 ref={finishRidePanelRef}
                 className='fixed w-full z-[500] bottom-0 translate-y-full bg-white px-4 py-6 pt-8 rounded-t-3xl shadow-2xl'
@@ -142,19 +142,8 @@ const CaptainRiding = () => {
                     ride={rideData}   // ✅ IMPORTANT FIX
                     setFinishRidePanel={setFinishRidePanel}
                 />
-            </div> */}
-
-            {/* FINISH RIDE PANEL */}
-            <div
-                ref={finishRidePanelRef}
-                className='fixed w-full z-500 bottom-0 translate-y-full bg-white px-4 py-6 pt-8 shadow-2xl rounded-t-3xl overflow-y-auto'
-                style={{ maxHeight: '75vh' }}   {/* ✅ only takes bottom 75% of screen */}
-            >
-                <FinishRide
-                    ride={rideData}
-                    setFinishRidePanel={setFinishRidePanel}
-                />
             </div>
+
         </div>
     )
 }

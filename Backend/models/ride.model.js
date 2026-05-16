@@ -54,7 +54,7 @@ const rideSchema = new mongoose.Schema({
         enum: ['car', 'moto', 'auto'],
         required: true
     }
-},{timestamps:true});
+});
 
 const rideModel = mongoose.model('ride', rideSchema);
 

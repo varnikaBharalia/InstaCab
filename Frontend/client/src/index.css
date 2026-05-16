@@ -1,23 +1,2 @@
- @import "tailwindcss"; 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background: linear-gradient(145deg, #fce4ec 0%, #f8bbd0 40%, #ffd6e7 70%, #fff0f5 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#root {
-  position: fixed;
-  width: 375px;
-  height: 667px;
-  left: 50%;
-  transform: translateX(-50%);
-  overflow: hidden;
-  background: white;
-  box-shadow: 0 0 60px rgba(229, 111, 150, 0.25);
-}
+@import "tailwindcss";
+/* import "mapbox-gl/dist/mapbox-gl.css"; */

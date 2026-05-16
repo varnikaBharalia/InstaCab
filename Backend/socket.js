@@ -108,16 +108,7 @@ export const initializeSocket = (server) => {
             // ✅ NEW: notify captain of any pending nearby rides
             try {
                 const captain = await captainModel.findById(userId);
-                // const pendingRides = await rideModel.find({ status: 'pending' }).populate('user').select('+otp');
-
-                // --------------------------updated the pending issue 
-                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-
-                const pendingRides = await rideModel.find({
-                    status: 'pending',
-                    createdAt: { $gte: fiveMinutesAgo }
-                }).populate('user').select('+otp');
-
+                const pendingRides = await rideModel.find({ status: 'pending' }).populate('user').select('+otp');
 
                 for (const ride of pendingRides) {
                     const pickupCoords = await getAddressCoordinate(ride.pickup);
