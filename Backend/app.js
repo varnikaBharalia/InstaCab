@@ -24,9 +24,12 @@ app.use(cors({
 // app.options('*', cors({ origin: FRONTEND_URL, credentials: true }));
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.get('/', (req, res) => {
+	res.send('InstaCab Backend is running securely and successfully!');
+});
 app.use('/users', userRoutes);
 app.use('/captains', captainRoutes);
 app.use('/maps', mapsRoutes);
